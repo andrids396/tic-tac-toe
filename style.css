@@ -1,0 +1,47 @@
+.gridContainer{
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.tabel{
+    display: grid;
+    grid-template-columns: 100px 100px 100px;
+    grid-template-rows: 100px 100px 100px;
+    /* height: 100vh; */
+    justify-content: center;
+    align-content: center;
+    /* gap: 0;
+    margin: 0; */
+}
+
+.kotak{
+    border: 3px solid black;
+    margin-top: -3px;
+    margin-left: -3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 60px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button{
+    /* margin: 0; */
+    padding: 10px 20px;
+    cursor: pointer;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#giliranPion{
+    /* margin: 0; */
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 50px;
+    font-weight: bold;
+}
