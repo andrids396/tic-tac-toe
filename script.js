@@ -79,7 +79,7 @@ function logikaGame(cekGiliran){
     };
     if (giliran === "O" && modePermainan == "vsBot"){
         gameBerjalan = false
-        setTimeout(() => {botO();}, 400);
+        setTimeout(() => {botO();}, 1000);
         gameBerjalan = true
     }
 };
