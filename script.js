@@ -1,111 +1,162 @@
-let permainanBerjalan = true; // permainan berhenti bila ada pemenang
-let giliran = "giliranX"; // bergantian pemain X dna O
-let dataPionX = [];
-let dataPionO = [];
-let dataKemenangan = [
-    ["kotak-1", "kotak-2", "kotak-3"], ["kotak-4", "kotak-5", "kotak-6"], ["kotak-7", "kotak-8", "kotak-9"], // horizontal
-    ["kotak-1", "kotak-4", "kotak-7"], ["kotak-2", "kotak-5", "kotak-8"], ["kotak-3", "kotak-6", "kotak-9"], // vertikal
-    ["kotak-1", "kotak-5", "kotak-9"], ["kotak-3", "kotak-5", "kotak-7"] // diagonal
+// === inisiasi awal ===
+let gameBerjalan = true;
+giliran = "X";
+let dataX = [];
+let dataO = [];
+let pemenang;
+let modePermainan; // defaoult mode permainan
+gantiMode();
+let kumpulanKotak = [
+    "kotak-1","kotak-2","kotak-3",
+    "kotak-4","kotak-5","kotak-6",
+    "kotak-7","kotak-8","kotak-9"
 ];
+let kumpulanKombinasiMenang = [
+    ["kotak-1","kotak-2","kotak-3"],["kotak-4","kotak-5","kotak-6"],["kotak-7","kotak-8","kotak-9"], // horizontak
+    ["kotak-1","kotak-4","kotak-7"],["kotak-2","kotak-5","kotak-8"],["kotak-3","kotak-6","kotak-9"], // vertikal
+    ["kotak-1","kotak-5","kotak-9"],["kotak-3","kotak-5","kotak-7"]  // diagonal
+];
+// tampilan giliran awal game
+document.getElementById("giliranPion").innerHTML = giliran
 
-// menggambar pion awal game
-if (giliran === "giliranX"){
-    document.getElementById("giliranPion").innerHTML = "X";
-}else{
-    document.getElementById("giliranPion").innerHTML = "O";
-}
-
-function klikKotak(id){
-  let isiKotak = document.getElementById(id).innerHTML;
-  if (permainanBerjalan && (isiKotak === "")){
-    // menambah pion ke kotak
-    if (giliran === "giliranX"){
-        document.getElementById(id).innerHTML = "X";
-        document.getElementById(id).style.color = "black";
-        giliran = "giliranO";
-        dataPionX.push(id);
-
-        // menghapus pion X yang pindah
-        if (dataPionX.length === 4){
-            document.getElementById(dataPionX[0]).innerHTML = "";
-            dataPionX.shift();
-
-        }
-        // cek kemenangan X
-        let dataCekKemenanganX = [...dataPionX];
-        dataCekKemenanganX.sort();
-
-        for (let item of dataKemenangan){
-            if (item[0] === dataCekKemenanganX[0] && item[1] === dataCekKemenanganX[1] && item[2] === dataCekKemenanganX[2]){
-                document.getElementById("giliranPion").innerHTML = "X MENANG";
-                permainanBerjalan = false;
-                // console.log("X MENANG");
-                return;
-            }
-        };
-        
-
-        // menandai pion O yang akan pindah
-        if (dataPionO.length === 3){
-            document.getElementById(dataPionO[0]).style.color = "red";
-        }
-    }else{
-        document.getElementById(id).innerHTML = "O";
-        document.getElementById(id).style.color = "black";
-        giliran = "giliranX";
-        dataPionO.push(id);
-
-        // menghapus pion O yang pindah
-        if (dataPionO.length === 4){
-            document.getElementById(dataPionO[0]).innerHTML = "";
-            dataPionO.shift();
-
-        }
-        // cek kemenangan O
-        let dataCekKemenanganO = [...dataPionO];
-        dataCekKemenanganO.sort();
-        for (let item of dataKemenangan){
-            if (item[0] === dataCekKemenanganO[0] && item[1] === dataCekKemenanganO[1] && item[2] === dataCekKemenanganO[2]){
-                document.getElementById("giliranPion").innerHTML = "O MENANG";
-                permainanBerjalan = false;
-                // console.log("O MENANG")
-                return;
-            }
-        };
-
-
-        // menandai pion X yang akan pindah
-        if (dataPionX.length === 3){
-            document.getElementById(dataPionX[0]).style.color = "red";
-        }
+// === update display ===
+function updateDisplay(){
+    // 1. menghapus semua isi kotak
+    document.querySelectorAll(".kotak").forEach(kotak=>{
+        kotak.innerHTML = "";
+        kotak.style.color = "black";
+    })
+    
+    // 2. menggambar X
+    for (let item of dataX){
+        document.getElementById(item).innerHTML = "X";
     }
-    // menggambar giliran pion
-      if (giliran === "giliranX"){
-          document.getElementById("giliranPion").innerHTML = "X";
-      }else{
-          document.getElementById("giliranPion").innerHTML = "O";
-      }
-  }
-//   console.log("X: " + dataPionX);
-//   console.log("O: " + dataPionO);
+    
+    // 3. menggambar O
+    for (let item of dataO){
+        document.getElementById(item).innerHTML = "O";
+    }
+
+    // 4. giliran pion
+    document.getElementById("giliranPion").innerHTML = giliran;
+
+    // 5. mengubah warna pion yang akan hilang
+    if (dataX.length !== 3 || dataO.length !== 3){
+        return
+    }
+
+    if (giliran === "X"){
+        document.getElementById(dataX[2]).style.color = "red";
+    }else{
+        document.getElementById(dataO[2]).style.color = "red";
+    }
 };
 
-// riset permainan
-function risetPermainan(namaKelas){
-    // mengambil semua element dengan class kotak
-    let daftarKotak = document.querySelectorAll(".kotak");
+// === logika game ===
+function logikaGame(cekGiliran){
+    // 1. menghapus posisi pion kedaluarsa dan mengganti giliran
+    if (cekGiliran === "X"){
+        dataX.splice(3); // menghapus
+        giliran = "O";
+    }else{
+        dataO.splice(3);
+        giliran = "X";
+    }
 
-    // perulangan untuk setiap kotak
-    daftarKotak.forEach(function(kotak){
-        kotak.innerHTML = "";
-        dataPionO = [];
-        dataPionX = [];
-        permainanBerjalan = true;
-        if(giliran === "giliranX"){
-            pion = "X";
-        }else{
-            pion = "O"
+    // 2. memeriksa kemenangan
+    if (giliran !== "X"){
+        cekDataMenang = [...dataX].sort();
+        pemenang = "X MENANG"
+    }else{
+        cekDataMenang = [...dataO].sort();
+        pemenang = "O MENANG"
+    }
+    for (let item of kumpulanKombinasiMenang){
+        if (item[0] === cekDataMenang[0] && item[1] === cekDataMenang[1] && item[2] === cekDataMenang[2]){
+            giliran = pemenang
+            gameBerjalan = false
         }
-        document.getElementById("giliranPion").innerHTML = pion;
-    })
-}
+    };
+    if (giliran === "O" && modePermainan == "vsBot"){
+        botO();
+    }
+};
+
+// BOT untuk pion O mengutamakan kemenangan sendiri
+function botO(){
+    // kotak kosong
+    let kotakIsi = dataX.concat(dataO);
+    let kotakKosong = kumpulanKotak.filter(item => !kotakIsi.includes(item));
+
+    // O
+    // kotak langkah kemenangan O
+    let langkahKemenanganOMentah = kumpulanKombinasiMenang.filter(subArray => dataO.slice(0, 2).every(elemen => subArray.includes(elemen))).flat();
+    // console.log(langkahKemenanganOMentah);
+    let langkahKemenanganO = [...new Set(langkahKemenanganOMentah)];
+    console.log(langkahKemenanganO);
+
+    // kotakDipilih = kotak kosong irisan dengan kotang langkah kemenangan O; jika tidak ada
+    let langkahKemenanganOMasihKosong = kotakKosong.filter(item => langkahKemenanganO.includes(item));
+
+    // X
+    // kotak langkah kemenangan x
+    let langkahKemenanganXMentah = kumpulanKombinasiMenang.filter(subArray => dataX.slice(0, 2).every(elemen => subArray.includes(elemen))).flat();
+    let langkahKemenanganX = [...new Set(langkahKemenanganXMentah)];
+
+    // kotakDipilih = kotak kosong irisan dengan kotang langkah kemenangan O; jika tidak ada
+    let langkahKemenanganXMasihKosong = kotakKosong.filter(item => langkahKemenanganX.includes(item));
+
+    if (langkahKemenanganXMasihKosong.length > 0 && langkahKemenanganOMasihKosong.length !== 1){
+        kemungkinanKotak = langkahKemenanganXMasihKosong;
+    }else if (langkahKemenanganOMasihKosong.length > 0){
+        kemungkinanKotak = langkahKemenanganOMasihKosong;
+    }else{
+        kemungkinanKotak = kotakKosong;
+    }
+
+    // pilih acak kotak kosong
+    kotakKosongDipilih = kemungkinanKotak[Math.floor(Math.random()* kemungkinanKotak.length)];
+    dataO.unshift(kotakKosongDipilih);
+    logikaGame();
+    updateDisplay();
+};
+
+
+// === menangani event ===
+
+// klik kotak
+function klikKotak(id){
+    let isiKotak = document.getElementById(id).innerHTML
+    if (!gameBerjalan || isiKotak !== ""){
+        return; // bila kotak sudah terisi atau game berhenti(menang) maka tidak bisa update data dan display
+    }
+    if (giliran === "X"){
+        dataX.unshift(id); // menambah data
+    } else{
+        dataO.unshift(id); 
+    }
+    logikaGame(giliran);
+    updateDisplay();
+    // console.log("X: " + dataX)
+    // console.log("O: " + dataO)
+};
+
+// tombol riser
+function risetPermainan(){
+    dataX = [];
+    dataO = [];
+    gameBerjalan = true;
+    if (giliran === "X MENANG" || giliran === "O"){
+        giliran = "O";
+        botO();
+    }else{
+        giliran = "X";
+    }
+    updateDisplay();
+};
+
+// tombol ganti mode permainan
+function gantiMode(){
+    modePermainan = document.getElementById("modePermainan").value;
+    risetPermainan();
+};
