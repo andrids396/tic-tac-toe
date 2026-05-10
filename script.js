@@ -41,7 +41,7 @@ function updateDisplay(){
     document.getElementById("giliranPion").innerHTML = giliran;
 
     // 5. mengubah warna pion yang akan hilang
-    if (dataX.length !== 3 || dataO.length !== 3){
+    if (dataX.length !== 3 || dataO.length !== 3 || !gameBerjalan){
         return
     }
 
@@ -78,7 +78,9 @@ function logikaGame(cekGiliran){
         }
     };
     if (giliran === "O" && modePermainan == "vsBot"){
-        botO();
+        gameBerjalan = false
+        setTimeout(() => {botO();}, 400);
+        gameBerjalan = true
     }
 };
 
